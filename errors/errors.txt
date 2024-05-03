@@ -1,0 +1,16 @@
+simple.py
+
+[INFO] tello.py - 129 - Tello instance was initialized. Host: '192.168.10.1'. Port: '8889'.
+[INFO] tello.py - 438 - Send command: 'command'
+[INFO] tello.py - 462 - Response command: 'ok'
+[INFO] tello.py - 438 - Send command: 'takeoff'
+[INFO] tello.py - 462 - Response takeoff: 'ok'
+[INFO] tello.py - 438 - Send command: 'left 100'
+[INFO] tello.py - 462 - Response left 100: 'ok'
+[INFO] tello.py - 438 - Send command: 'cw 90'
+[INFO] tello.py - 462 - Response cw 90: 'error No valid imu'
+[INFO] tello.py - 438 - Send command: 'cw 90'
+[INFO] tello.py - 462 - Response cw 90: 'error Not joystick'
+[INFO] tello.py - 438 - Send command: 'cw 90'
+[INFO] tello.py - 462 - Response cw 90: 'error No valid imu'
+

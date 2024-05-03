@@ -1,0 +1,30 @@
+from collections import deque
+
+import numpy as np
+
+
+class SingleMetricDiffDetector:
+    def __init__(self, metric, threshold):
+        self.threshold = threshold
+        self.metric = metric
+        self.records = deque([], maxlen=2)
+
+    def add(self, row: dict):
+        if self.metric not in row:
+            raise Exception(f"Metric {self.metric} not in received state.")
+        self.records.append(row[self.metric])
+
+    def update(self, state: dict):
+        self.add(state)
+        if len(self.records) < 2:
+            return False
+
+        check = self.check_collision()
+
+        return check
+
+    def check_collision(self):
+        dif = np.abs(np.diff(self.records)).item()
+        check = dif > self.threshold
+        return check
+
