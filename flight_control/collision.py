@@ -14,9 +14,9 @@ from analysis import aggregate, detector
 class CollisionDetector:
     def __init__(self,
                  aggregator: aggregate.BaseAggregator,
-                 detector: detector.BaseDetector):
+                 detect: detector.BaseDetector):
         self.aggregator = aggregator
-        self.detector = detector
+        self.detector = detect
 
     def __call__(self, new_value):
         agg_value = self.aggregator(new_value)
