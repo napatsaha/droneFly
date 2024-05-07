@@ -1,6 +1,27 @@
 from collections import deque
 
 import numpy as np
+from analysis import aggregate, detector
+
+# AGG_NAMES = {
+#     "basic": 'BaseAggregator',
+#     "single diff": 'DiffAggregator',
+#     "multi": 'MultiAggregator',
+#     "multi diff": 'MultiDiffAggregator'
+# }
+
+
+class CollisionDetector:
+    def __init__(self,
+                 aggregator: aggregate.BaseAggregator,
+                 detector: detector.BaseDetector):
+        self.aggregator = aggregator
+        self.detector = detector
+
+    def __call__(self, new_value):
+        agg_value = self.aggregator(new_value)
+        has_collided = self.detector(agg_value)
+        return has_collided
 
 
 class SingleMetricDiffDetector:
@@ -27,4 +48,3 @@ class SingleMetricDiffDetector:
         dif = np.abs(np.diff(self.records)).item()
         check = dif > self.threshold
         return check
-

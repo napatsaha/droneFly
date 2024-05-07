@@ -5,7 +5,7 @@ import matplotlib
 from matplotlib.animation import FuncAnimation
 
 from analysis.aggregate import DiffAggregator, MultiDiffAggregator
-from analysis.zscore_bump import ZScorePeakDetection
+from analysis.detector import ZScorePeakDetection
 
 
 if __name__ == "__main__":
@@ -55,7 +55,7 @@ if __name__ == "__main__":
         #     reset()
 
         newvalue = aggregator(row)
-        bump = detector.add(newvalue)
+        bump = detector(newvalue)
 
         originals.append(newvalue)
         signals.append(int(bump))
@@ -89,7 +89,7 @@ if __name__ == "__main__":
         fig, ax = plt.subplots(2, 1, figsize=(5, 10))
         for row in data.itertuples():
             newvalue = aggregator(row)
-            bump = detector.add(newvalue)
+            bump = detector(newvalue)
 
             originals.append(newvalue)
             signals.append(int(bump))

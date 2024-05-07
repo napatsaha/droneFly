@@ -11,12 +11,23 @@ See:
 https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-timeseries-data/22640362#22640362
 """
 import logging
+from abc import ABC, abstractmethod
+
 import numpy as np
 import pandas as pd
 from collections import deque
 
 
-class ZScorePeakDetection:
+class BaseDetector(ABC):
+    def add(self, value) -> bool:
+        pass
+
+    @abstractmethod
+    def __call__(self, value) -> bool:
+        pass
+
+
+class ZScorePeakDetection(BaseDetector):
     """
     Class docstring
     """
@@ -61,6 +72,9 @@ class ZScorePeakDetection:
         self._recalculate()
 
         return is_signal
+
+    def __call__(self, new_value):
+        return self.add(new_value)
 
     def _append(self, new_value, signal: bool):
         """
