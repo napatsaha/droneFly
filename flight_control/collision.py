@@ -21,6 +21,8 @@ class CollisionDetector:
     def __call__(self, new_value):
         agg_value = self.aggregator(new_value)
         has_collided = self.detector(agg_value)
+        if has_collided:
+            print(agg_value)
         return has_collided
 
 

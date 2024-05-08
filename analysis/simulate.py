@@ -15,12 +15,12 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
 
-    filename = "../data/Straight_24-04-22_14-03.csv"
+    filename = "../data/Curved_24-04-22_14-47-46.csv"
     data = pd.read_csv(filename)
     metric = ["agx", "agy", "agz"]
     aggregator = MultiDiffAggregator(window=5, metrics=metric)
 
-    detector = ZScorePeakDetection(window=20, threshold=5, influence=0.01)
+    detector = ZScorePeakDetection(window=20, threshold=5, influence=1)
 
     if animate:
         matplotlib.use("TkAgg")

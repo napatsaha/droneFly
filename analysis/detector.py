@@ -64,7 +64,7 @@ class ZScorePeakDetection(BaseDetector):
             is_signal = z >= self.threshold
             if is_signal:
                 self.logger.debug("Current Mean: %f -- Std: %f", self.mean, self.std)
-                self.logger.debug("New Value: %d -- Z Score %d", new_value, z)
+                self.logger.debug("New Value: {} -- Z Score {}".format(new_value, z))
         else:
             is_signal = False
 

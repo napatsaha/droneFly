@@ -52,20 +52,27 @@ def collision_handler():
 
 
 FPS = 20
-FLY_DURATION = 7
+FLY_DURATION = 60
 # FLIGHT_NAME = "Curved"
 
 logging.basicConfig(level=logging.INFO,
                     format="%(asctime)s -- %(threadName)s -- %(msg)s",
                     datefmt="%H:%M:%S")
+
+logger = logging.getLogger("ZScorer")
+logger.setLevel(logging.DEBUG)
+logger.addHandler(logging.StreamHandler())
+
 signal.signal(signal.SIGTERM, signal_handler)
 main_timer = MainTimer(duration=FLY_DURATION)
 
 metric = ["agx", "agy", "agz"]
 aggregator = aggregate.MultiDiffAggregator(window=5, metrics=metric)
-peaker = detector.ZScorePeakDetection(window=20, threshold=5, influence=0.1)
+peaker = detector.ZScorePeakDetection(window=20, threshold=20, influence=0.1)
 collision_detector = CollisionDetector(aggregator, peaker)
 collision_thread = threading.Thread(target=collision_handler, name="Collision")
+
+ascent_timer = MainTimer(duration=3)
 
 
 drone = Tello()
@@ -76,12 +83,19 @@ drone.connect()
 try:
     logging.info("Taking Off")
     drone.takeoff()
+    drone.send_rc_control(0, 0, 30, 0)
 
-    main_timer.start()
     collision_thread.start()
+    ascent_timer.start()
+
+    while ascent_timer.is_valid():
+        time.sleep(1/FPS)
+
+    logging.info("Stopped Ascending")
+    main_timer.start()
 
     logging.info("Sending Movement Command")
-    drone.send_rc_control(-10, 30, 10, -25)
+    drone.send_rc_control(-10, 0, 0, 0)
 
     while main_timer.is_valid():
         time.sleep(1/FPS)
@@ -96,7 +110,8 @@ finally:
         logging.info("Landing normally")
         drone.land()
 
-    logging.info("Battery remaining %s", drone.get_battery())
+    # logging.info("Battery remaining %s", drone.get_battery())
+    print(f"Battery: {drone.get_battery()}%")
 
     drone.end()
 

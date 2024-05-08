@@ -2,8 +2,8 @@ import time, csv, os
 from djitellopy import Tello
 
 FPS = 20
-FLY_DURATION = 5
-FLIGHT_NAME = "Blocked"
+FLY_DURATION = 10
+FLIGHT_NAME = "Gust"
 DIR_NAME = "../data"
 
 if not os.path.exists(DIR_NAME):
@@ -31,8 +31,9 @@ t0 = time.time()
 
 
 try:
-    drone.send_rc_control(0, 20, 0, 45)
+    drone.send_rc_control(-10, 0, 0, 0)
     time_elapsed = time.time() - t0
+    print("Start")
     while time_elapsed < FLY_DURATION:
         state = drone.get_current_state()
         state['time_elapsed'] = f"{time_elapsed:.3f}"
