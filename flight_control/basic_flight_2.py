@@ -1,3 +1,9 @@
+"""
+Single control (with initial ascent)
+Zscore-based windowed-Jerk-sum xyz acceleration as signal to detect collision
+"""
+
+
 import time, csv, os
 import threading
 import logging
