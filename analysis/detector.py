@@ -63,7 +63,7 @@ class ZScorePeakDetection(BaseDetector):
             z = np.abs((new_value - self.mean) / self.std)
             is_signal = z >= self.threshold
             if is_signal:
-                self.logger.debug("Current Mean: %f -- Std: %f", self.mean, self.std)
+                self.logger.debug("Current Mean: %f -- Std: %f" % (self.mean, self.std))
                 self.logger.debug("New Value: {} -- Z Score {}".format(new_value, z))
         else:
             is_signal = False
@@ -84,7 +84,7 @@ class ZScorePeakDetection(BaseDetector):
             # old_value = new_value
             new_value = self.influence * new_value + \
                         (1 - self.influence) * self.sample[-1]
-            self.logger.debug("Adjusted value %d", new_value)
+            self.logger.debug("Adjusted value %f" % new_value)
         self.sample.append(new_value)
 
     def _recalculate(self):

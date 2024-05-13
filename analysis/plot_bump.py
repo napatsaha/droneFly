@@ -8,9 +8,9 @@ save = False
 
 # Tuples of file paths and labels (if known)
 files = [
-    ("../data/Gust_24-05-08_16-12-16.csv", ""),
-    ("../data/Gust_24-05-08_16-14-08.csv", ""),
-    ("../data/Gust_24-05-08_16-17-11.csv", ""),
+    # ("../data/Gust_24-05-08_16-12-16.csv", ""),
+    # ("../data/Gust_24-05-08_16-14-08.csv", ""),
+    # ("../data/Gust_24-05-08_16-17-11.csv", ""),
     ("../data/Gust_24-05-08_16-17-42.csv", "")
 ]
 # f_bump = "data/Curved_24-04-22_14-47-46.csv"

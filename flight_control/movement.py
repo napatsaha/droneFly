@@ -41,6 +41,7 @@ class Controller:
         self.file = open(filename, 'r')
         self.reader = csv.reader(self.file, delimiter=',')
 
+        self._stopped = False
         self.drone = drone
         self.fps = fps
 
@@ -56,18 +57,24 @@ class Controller:
         self.current_control = rc
 
     def execute(self):
+        logging.info("Sending control {} for {} seconds".format(self.current_control, self.timer.duration))
         self.timer.start()
         self.drone.send_rc_control(*self.current_control)
-        while self.timer.is_valid():
+        while not self._stopped and self.timer.is_valid():
             time.sleep(1/self.fps)
 
     def run(self):
-        while True:
+        while not self._stopped:
             try:
                 self.next()
                 self.execute()
             except StopIteration:
+                logging.info("Ended movement execution")
                 break
+
+    def stop(self):
+        logging.info("Movement stopped abruptly")
+        self._stopped = True
 
     def close(self):
         self.file.close()
