@@ -76,7 +76,7 @@ class Controller:
             logging.info("Setting Termination Event due to completion of movement")
             event.set()
 
-    # def stop(self):
+    # def close(self):
     #     logging.info("Movement stopped abruptly")
     #     self._stopped = True
 

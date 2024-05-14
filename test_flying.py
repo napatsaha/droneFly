@@ -22,7 +22,7 @@ try:
     drone.move_forward(50)
 
 finally:
-    # drone.send_command_without_return("stop")
+    # drone.send_command_without_return("close")
 
 # drone.send_rc_control(0, 30, 0, 60)
 # time.sleep(5)

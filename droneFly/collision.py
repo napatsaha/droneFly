@@ -5,6 +5,42 @@ import time
 from djitellopy import Tello
 
 from droneFly import aggregate, detector
+from droneFly.base import BaseWorker
+
+
+class CollisionThread(BaseWorker):
+
+    drone: Tello
+
+    def __init__(self,
+                 drone: Tello,
+                 aggregator: aggregate.BaseAggregator,
+                 peaker: detector.BaseDetector,
+                 stopper: threading.Event, fps: int, **kwargs):
+        super().__init__(stopper, fps, **kwargs)
+        self.aggregator = aggregator
+        self.peaker = peaker
+        self.drone = drone
+
+    def process(self, state_dict: dict):
+        agg_value = self.aggregator(state_dict)
+        has_collided = self.peaker(agg_value)
+        if has_collided:
+            logging.info("Collision threshold reached: %.2f" % agg_value)
+        return has_collided
+
+    def _run(self):
+        state = self.drone.get_current_state()
+
+        collide = self.process(state)
+
+        if collide:
+            logging.info("Collided")
+            self.terminate()
+
+    def close(self):
+        super().close()
+        # logging.info("Setting Termination Event due to collision")
 
 
 class CollisionDetector:

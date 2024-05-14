@@ -87,7 +87,7 @@ try:
     movement_thread.join()
 
 except ExitCommand:
-    # controller.stop()
+    # controller.close()
     logging.info("Landing due to collision")
     drone.land()
 

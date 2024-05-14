@@ -3,9 +3,10 @@ import threading
 import csv
 
 from djitellopy import Tello
+from droneFly.base import BaseWorker
 
 
-class Controller:
+class Controller(BaseWorker):
     """
     Class for setting instructions to control flight of Tello drone, via
     RC controls (left, forward, up, yaw) and duration instructions stored in a file.
@@ -20,16 +21,24 @@ class Controller:
     """
 
     drone: Tello
+
     # timer: Timer
     # current_control: Tuple
-
-    def __init__(self, drone: Tello, filename: str, fps: int):
+    def __init__(self, drone: Tello, filename: str, stopper: threading.Event, fps: int, **kwargs):
+        super().__init__(stopper, fps, **kwargs)
         self.file = open(filename, 'r')
         self.reader = csv.reader(self.file, delimiter=',')
 
         # self._stopped = False
         self.drone = drone
-        self.fps = fps
+
+    def _run(self):
+        try:
+            rc, dur = self.read_next_line()
+            self.process_movement(rc, dur)
+        except StopIteration:
+            logging.info("Ended movement execution")
+            self.terminate()
 
     def read_next_line(self) -> tuple:
         row = next(self.reader)
@@ -42,32 +51,33 @@ class Controller:
     #     self.timer = Timer(duration=dur)
     #     self.current_control = rc
 
-    def process_movement(self, rc, dur, e):
+    def process_movement(self, rc, dur):
         logging.info("Sending control {} for {} seconds".format(rc, dur))
 
         self.drone.send_rc_control(*rc)
 
-        e.wait(dur)
+        self.stopper.wait(dur)
 
-    def run(self, event: threading.Event):
-        logging.info("Beginning Movement Procedures")
-        while not event.is_set():
+    # def run(self, event: threading.Event):
+    #     logging.info("Beginning Movement Procedures")
+    #     while not event.is_set():
+    #
+    #         try:
+    #             rc, dur = self.read_next_line()
+    #             self.process_movement(rc, dur, event)
+    #         except StopIteration:
+    #             logging.info("Ended movement execution")
+    #             break
+    #
+    #     if not event.is_set():
+    #         logging.info("Setting Termination Event due to completion of movement")
+    #         event.set()
 
-            try:
-                rc, dur = self.read_next_line()
-                self.process_movement(rc, dur, event)
-            except StopIteration:
-                logging.info("Ended movement execution")
-                break
-
-        if not event.is_set():
-            logging.info("Setting Termination Event due to completion of movement")
-            event.set()
-
-    # def stop(self):
+    # def close(self):
     #     logging.info("Movement stopped abruptly")
     #     self._stopped = True
 
     def close(self):
-        logging.info("Terminating Movement Handler")
+        super().close()
+        # logging.info("Terminating Movement Handler")
         self.file.close()
