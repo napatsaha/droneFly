@@ -8,13 +8,13 @@ Zscore-based windowed-Jerk-sum xyz acceleration as signal to detect collision
 
 import threading
 import logging
-import signal
+import os
 
 from djitellopy import Tello
 
-from . import aggregate, detector
-from .collision import CollisionDetector, collision_handler
-from .movement import Controller
+from droneFly import aggregate, detector, FLIGHT_PATH_DIR
+from droneFly.collision import CollisionDetector, collision_handler
+from droneFly.movement import Controller
 
 
 def main():
@@ -23,6 +23,9 @@ def main():
     FPS = 20
     MAX_WAIT = 30
     metric = ["agx", "agy", "agz"]
+    flight_file = "move4.csv"
+    agg_kwargs = dict(window=5)
+    pk_kwargs = dict(window=20, threshold=5, influence=0.1)
 
     # Setup logging
     logging.basicConfig(level=logging.INFO,
@@ -35,8 +38,8 @@ def main():
 
     # Collision Handler
     collision_detector = CollisionDetector(
-        aggregate.MultiDiffAggregator(window=5, metrics=metric),
-        detector.ZScorePeakDetection(window=20, threshold=15, influence=0.1)
+        aggregate.MultiDiffAggregator(metrics=metric, **agg_kwargs),
+        detector.ZScorePeakDetection(**pk_kwargs)
     )
 
     collision_thread = threading.Thread(target=collision_handler, name="Collision",
@@ -47,7 +50,7 @@ def main():
                                         ))
 
     # Movement Handler
-    controller = Controller(drone, "move2.csv", fps=FPS)
+    controller = Controller(drone, os.path.join(FLIGHT_PATH_DIR, flight_file), fps=FPS)
     movement_thread = threading.Thread(target=controller.run, name="Movement", args=(terminate,))
 
     # Establish connection
@@ -69,6 +72,7 @@ def main():
 
         controller.close()
 
+        drone.send_rc_control(0,0,0,0)
         drone.land()
 
         # logging.info("Battery remaining %s", drone.get_battery())

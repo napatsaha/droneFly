@@ -72,4 +72,4 @@ class MultiAggregator(BaseAggregator):
 
 
 if __name__ == "__main__":
-    aggregator = MultiAggregator(5, )
+    pass

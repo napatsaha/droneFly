@@ -4,7 +4,7 @@ import time
 
 from djitellopy import Tello
 
-from . import aggregate, detector
+from droneFly import aggregate, detector
 
 
 class CollisionDetector:
