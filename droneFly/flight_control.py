@@ -24,7 +24,7 @@ def main():
     FPS = 20
     MAX_WAIT = 30
     metric = ["agx", "agy", "agz"]
-    flight_file = "move3.csv"
+    flight_file = "move2.csv"
     agg_kwargs = dict(window=5)
     pk_kwargs = dict(window=20, threshold=10, influence=0.1)
 
@@ -40,8 +40,12 @@ def main():
     # Collision Handler
     collision_thread = collision.CollisionThread(
         drone=drone, fps=FPS, stopper=terminate,
-        aggregator=aggregate.MultiDiffAggregator(metrics=metric, **agg_kwargs),
-        peaker=detector.ZScorePeakDetection(**pk_kwargs),
+        aggregator=aggregate.MultiDiffAggregator(metrics=metric, separate=True, **agg_kwargs),
+        peaker=detector.MergedPeakDetector(
+            detector_class=detector.ZScorePeakDetection,
+            metrics=metric,
+            acceptance_rate='any',
+            **pk_kwargs),
         name="Collision"
     )
 
@@ -79,8 +83,9 @@ def main():
 
     finally:
 
-        # for thread in threading.enumerate():
-        #     thread.is
+        # Safety check
+        if not terminate.is_set():
+            terminate.set()
 
         drone.send_rc_control(0,0,0,0)
         drone.land()

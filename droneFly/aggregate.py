@@ -37,9 +37,21 @@ class MultiDiffAggregator(BaseAggregator):
     """
     Utilise the sum of absolute differences for one or more metrics.
     """
-    def __init__(self, window, metrics):
+    def __init__(self, window, metrics, separate: bool = False):
+        """
+
+        :param window:
+        :type window:
+        :param metrics:
+        :type metrics:
+        :param separate: whether to sum across metrics when aggregating
+            if False (default), return a single value, summed across metrics
+            if True, returns a tuple
+        :type separate: bool
+        """
         super().__init__(window)
         self.metrics = metrics
+        self.separate = separate
 
     def add(self, value):
         if isinstance(value, dict):
@@ -54,10 +66,12 @@ class MultiDiffAggregator(BaseAggregator):
         self.memory.append(value)
 
     def aggregate(self):
-        arr = np.array(self.memory) # -> 2D array
-        darr = np.sum(np.abs(np.diff(arr, axis=0)), axis=0) # sum of abs diff
-        carr = darr.sum() # sum across metrics
-        return carr
+        arr = np.array(self.memory)  # -> 2D array
+        darr = np.sum(np.abs(np.diff(arr, axis=0)), axis=0)  # sum of abs diff
+        if not self.separate:
+            return darr.sum()  # sum across metrics
+        else:
+            return darr
 
 
 class MultiAggregator(BaseAggregator):

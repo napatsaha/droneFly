@@ -2,6 +2,7 @@ import abc
 import logging
 import threading
 
+
 class BaseWorker(threading.Thread):
     """
     A worker class based on Threads that is made to be compatible with

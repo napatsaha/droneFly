@@ -12,6 +12,7 @@ https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-t
 """
 import logging
 from abc import ABC, abstractmethod
+from typing import Union, Literal, Tuple, List
 
 import numpy as np
 import pandas as pd
@@ -93,7 +94,64 @@ class ZScorePeakDetection(BaseDetector):
         """
         self.mean = np.mean(self.sample)
         self.std = np.std(self.sample)
-        
+
+
+class MergedPeakDetector(BaseDetector):
+    """
+    Peak Detector which combines separate PeakDetectors for detecting individual signal
+    independent of each other.
+
+    The number of peak detectors is based on the length of `metrics`.
+
+    `acceptance_rate` controls logic for combining result from separate detectors:
+    - based on a threshold of True proportions returned by detectors
+        (`acceptance_rate` is float)
+    - 'any': if any one of the detector returns True
+    - `all`: only if every single detector returns True
+    """
+    def __init__(self, detector_class: BaseDetector, metrics: list,
+                 acceptance_rate: Union[Literal['any', 'all'], float],
+                 *args, **kwargs):
+        if isinstance(acceptance_rate, float):
+            self._acceptance_strategy = 'threshold'
+            self.acceptance_rate = acceptance_rate
+        elif isinstance(acceptance_rate, str):
+            self._acceptance_strategy = 'boolean'
+            self.acceptance_rate = acceptance_rate
+        else:
+            raise Exception("Acceptance Rate must be one of (float, str('any', 'all')). Not: %s" % acceptance_rate)
+
+        self.metrics = metrics
+        self.detectors = [
+            detector_class(*args, **kwargs) for _ in self.metrics
+        ]
+
+    def __call__(self, value_tuple: tuple):
+        collision_tuple = []
+        for val, detect in zip(value_tuple, self.detectors):
+            collide = detect(val)
+            collision_tuple.append(collide)
+
+        verdict = self.judge(collision_tuple)
+
+        if verdict:
+            print(collision_tuple, value_tuple)
+            for i, a in enumerate(collision_tuple):
+                if a is True:
+                    print("Collision detected in %s" % self.metrics[i])
+
+        return verdict
+
+    def judge(self, evidence: Union[Tuple[bool], List[bool]]) -> bool:
+        if self._acceptance_strategy == "threshold":
+            return np.mean(evidence) >= self.acceptance_rate
+        elif self._acceptance_strategy == "boolean" and self.acceptance_rate == "any":
+            return np.any(evidence)
+        elif self._acceptance_strategy == "boolean" and self.acceptance_rate == "all":
+            return np.all(evidence)
+        else:
+            raise NotImplementedError("Strategy not implemented")
+
 
 if __name__ == "__main__":
 

@@ -25,7 +25,7 @@ class CollisionThread(BaseWorker):
     def process(self, state_dict: dict):
         agg_value = self.aggregator(state_dict)
         has_collided = self.peaker(agg_value)
-        if has_collided:
+        if has_collided and not self.aggregator.separate:
             logging.info("Collision threshold reached: %.2f" % agg_value)
         return has_collided
 
