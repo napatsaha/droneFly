@@ -24,6 +24,10 @@ class BaseWorker(threading.Thread):
         self.stopper = stopper
         self.fps = fps
 
+    def start(self) -> None:
+        logging.info("Started %s Thread" % self.getName())
+        super().start()
+
     def run(self):
         while not self.stopper.is_set():
             self._run()
@@ -34,8 +38,9 @@ class BaseWorker(threading.Thread):
 
     def close(self):
         if not self.stopper.is_set():
-
             self.terminate()
+
+        logging.info("Ended %s Thread" % self.getName())
 
     def terminate(self):
         logging.info("Terminating Event called from %s Thread" % self.getName())

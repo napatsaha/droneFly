@@ -14,19 +14,21 @@ from djitellopy import Tello
 
 from droneFly import aggregate, detector, collision, FLIGHT_PATH_DIR
 # from droneFly.collision import CollisionDetector, collision_handler
-from droneFly.movement import Controller
+from droneFly.flight import Controller
+from droneFly.monitor import DataCollector
 
 
 def main():
-    global collision_thread, movement_thread, terminate, drone
+    # For debugging purposes only
+    global collision_thread, movement_thread, terminate, drone, data_thread
 
     # Configurations
     FPS = 20
     MAX_WAIT = 30
     metric = ["agx", "agy", "agz"]
-    flight_file = "move2.csv"
+    flight_file = "move0.csv"
     agg_kwargs = dict(window=5)
-    pk_kwargs = dict(window=20, threshold=10, influence=0.1)
+    pk_kwargs = dict(window=20, threshold=50, influence=0.1)
 
     # Setup logging
     logging.basicConfig(level=logging.INFO,
@@ -38,7 +40,7 @@ def main():
     drone = Tello()
 
     # Collision Handler
-    collision_thread = collision.CollisionThread(
+    collision_thread = collision.CollisionHandler(
         drone=drone, fps=FPS, stopper=terminate,
         aggregator=aggregate.MultiDiffAggregator(metrics=metric, separate=True, **agg_kwargs),
         peaker=detector.MergedPeakDetector(
@@ -61,6 +63,8 @@ def main():
     #                                         collision_detector=collision_detector
     #                                     ))
 
+    data_thread = DataCollector(drone, terminate, FPS, name = "CSV")
+
     # Movement Handler
     movement_thread = Controller(drone, os.path.join(FLIGHT_PATH_DIR, flight_file),
                                  fps=FPS, stopper=terminate, name="Movement")
@@ -76,6 +80,8 @@ def main():
         collision_thread.start()
 
         movement_thread.start()
+
+        data_thread.start()
 
         # collision_thread.join()
         # movement_thread.join()

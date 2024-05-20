@@ -8,7 +8,7 @@ from droneFly import aggregate, detector
 from droneFly.base import BaseWorker
 
 
-class CollisionThread(BaseWorker):
+class CollisionHandler(BaseWorker):
 
     drone: Tello
 

@@ -12,7 +12,7 @@ https://stackoverflow.com/questions/22583391/peak-signal-detection-in-realtime-t
 """
 import logging
 from abc import ABC, abstractmethod
-from typing import Union, Literal, Tuple, List
+from typing import Union, Literal, Tuple, List, Type
 
 import numpy as np
 import pandas as pd
@@ -109,7 +109,7 @@ class MergedPeakDetector(BaseDetector):
     - 'any': if any one of the detector returns True
     - `all`: only if every single detector returns True
     """
-    def __init__(self, detector_class: BaseDetector, metrics: list,
+    def __init__(self, detector_class: Type[BaseDetector], metrics: list,
                  acceptance_rate: Union[Literal['any', 'all'], float],
                  *args, **kwargs):
         if isinstance(acceptance_rate, float):
