@@ -10,12 +10,16 @@ from djitellopy import Tello
 from droneFly.base import BaseWorker
 
 
-DIR_NAME = "../data"
+DIR_NAME = "..\\data"
 
 
 class DataCollector(BaseWorker):
 
     t0: float
+    state_keys = [
+        'pitch', 'roll', 'yaw', 'vgx', 'vgy', 'vgz', 'templ', 'temph',
+        'tof', 'h', 'bat', 'baro', 'time', 'agx', 'agy', 'agz'
+    ]
 
     def __init__(self,
                  drone: Tello,
@@ -23,18 +27,21 @@ class DataCollector(BaseWorker):
                  fps: int,
                  **kwargs):
         super().__init__(stopper, fps, **kwargs)
-
-        filename = datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%S-%f") + ".csv"
-        filename = os.path.join(DIR_NAME, filename)
-        self.csvfile = open(filename, 'w', newline='')
-
         self.drone = drone
 
-        state = [
-            'pitch', 'roll', 'yaw', 'vgx', 'vgy', 'vgz', 'templ', 'temph',
-            'tof', 'h', 'bat', 'baro', 'time', 'agx', 'agy', 'agz'
-        ]
-        self.writer = csv.DictWriter(self.csvfile, fieldnames=['time_elapsed'] + state)
+        # File creation based on current date time
+        date_dir = datetime.datetime.now().strftime("%Y-%m-%d")
+
+        path = os.path.join(DIR_NAME, date_dir)
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+        filename = datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%S-%f") + ".csv"
+        filename = os.path.join(path, filename)
+        self.csvfile = open(filename, 'w', newline='')
+
+        # Set up csv writer
+        self.writer = csv.DictWriter(self.csvfile, fieldnames=['time_elapsed'] + self.state_keys)
         self.writer.writeheader()
 
     def _run(self):

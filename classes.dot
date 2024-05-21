@@ -1,0 +1,28 @@
+digraph "classes" {
+rankdir=BT
+charset="utf-8"
+"droneFly.aggregate.BaseAggregator" [color="black", fontcolor="black", label=<{BaseAggregator|memory : deque<br ALIGN="LEFT"/>window<br ALIGN="LEFT"/>|add(value)<br ALIGN="LEFT"/>aggregate()<br ALIGN="LEFT"/>extract()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.detector.BaseDetector" [color="black", fontcolor="black", label=<{BaseDetector|<br ALIGN="LEFT"/>|<I>add</I>(value): bool<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.base.BaseWorker" [color="black", fontcolor="black", label=<{BaseWorker|fps : int<br ALIGN="LEFT"/>stopper : Event<br ALIGN="LEFT"/>|close()<br ALIGN="LEFT"/>run()<br ALIGN="LEFT"/>start(): None<br ALIGN="LEFT"/>terminate()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.collision.CollisionDetector" [color="black", fontcolor="black", label=<{CollisionDetector|aggregator<br ALIGN="LEFT"/>detector<br ALIGN="LEFT"/>|}>, shape="record", style="solid"];
+"droneFly.collision.CollisionHandler" [color="black", fontcolor="black", label=<{CollisionHandler|aggregator<br ALIGN="LEFT"/>drone : Tello<br ALIGN="LEFT"/>peaker<br ALIGN="LEFT"/>|close()<br ALIGN="LEFT"/>process(state_dict: dict)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.flight.Controller" [color="black", fontcolor="black", label=<{Controller|drone : Tello<br ALIGN="LEFT"/>file<br ALIGN="LEFT"/>reader<br ALIGN="LEFT"/>|close()<br ALIGN="LEFT"/>process_movement(rc, dur)<br ALIGN="LEFT"/>read_next_line(): tuple<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.monitor.DataCollector" [color="black", fontcolor="black", label=<{DataCollector|csvfile<br ALIGN="LEFT"/>drone : Tello<br ALIGN="LEFT"/>t0 : float<br ALIGN="LEFT"/>writer : DictWriter<br ALIGN="LEFT"/>|close()<br ALIGN="LEFT"/>start(): None<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.aggregate.DiffAggregator" [color="black", fontcolor="black", label=<{DiffAggregator|<br ALIGN="LEFT"/>|aggregate()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.detector.MergedPeakDetector" [color="black", fontcolor="black", label=<{MergedPeakDetector|acceptance_rate<br ALIGN="LEFT"/>detectors<br ALIGN="LEFT"/>metrics : list<br ALIGN="LEFT"/>|judge(evidence: Union[Tuple[bool], List[bool]]): bool<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.aggregate.MultiAggregator" [color="black", fontcolor="black", label=<{MultiAggregator|metrics<br ALIGN="LEFT"/>|add(row)<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.aggregate.MultiDiffAggregator" [color="black", fontcolor="black", label=<{MultiDiffAggregator|metrics<br ALIGN="LEFT"/>separate : bool<br ALIGN="LEFT"/>|add(value)<br ALIGN="LEFT"/>aggregate()<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.detector.ZScorePeakDetection" [color="black", fontcolor="black", label=<{ZScorePeakDetection|influence : float<br ALIGN="LEFT"/>logger : NoneType, RootLogger<br ALIGN="LEFT"/>mean : NoneType, ndarray<br ALIGN="LEFT"/>sample : deque<br ALIGN="LEFT"/>std : NoneType, ndarray<br ALIGN="LEFT"/>threshold : float<br ALIGN="LEFT"/>window : int<br ALIGN="LEFT"/>|add(new_value): bool<br ALIGN="LEFT"/>}>, shape="record", style="solid"];
+"droneFly.aggregate.DiffAggregator" -> "droneFly.aggregate.BaseAggregator" [arrowhead="empty", arrowtail="none"];
+"droneFly.aggregate.MultiAggregator" -> "droneFly.aggregate.BaseAggregator" [arrowhead="empty", arrowtail="none"];
+"droneFly.aggregate.MultiDiffAggregator" -> "droneFly.aggregate.BaseAggregator" [arrowhead="empty", arrowtail="none"];
+"droneFly.collision.CollisionHandler" -> "droneFly.base.BaseWorker" [arrowhead="empty", arrowtail="none"];
+"droneFly.detector.MergedPeakDetector" -> "droneFly.detector.BaseDetector" [arrowhead="empty", arrowtail="none"];
+"droneFly.detector.ZScorePeakDetection" -> "droneFly.detector.BaseDetector" [arrowhead="empty", arrowtail="none"];
+"droneFly.flight.Controller" -> "droneFly.base.BaseWorker" [arrowhead="empty", arrowtail="none"];
+"droneFly.monitor.DataCollector" -> "droneFly.base.BaseWorker" [arrowhead="empty", arrowtail="none"];
+"droneFly.aggregate.BaseAggregator" -> "droneFly.collision.CollisionDetector" [arrowhead="odiamond", arrowtail="none", fontcolor="green", label="aggregator", style="solid"];
+"droneFly.aggregate.BaseAggregator" -> "droneFly.collision.CollisionHandler" [arrowhead="odiamond", arrowtail="none", fontcolor="green", label="aggregator", style="solid"];
+"droneFly.detector.BaseDetector" -> "droneFly.collision.CollisionDetector" [arrowhead="odiamond", arrowtail="none", fontcolor="green", label="detector", style="solid"];
+"droneFly.detector.BaseDetector" -> "droneFly.collision.CollisionHandler" [arrowhead="odiamond", arrowtail="none", fontcolor="green", label="peaker", style="solid"];
+}

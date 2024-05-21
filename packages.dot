@@ -1,0 +1,24 @@
+digraph "packages" {
+rankdir=BT
+charset="utf-8"
+"droneFly" [color="black", label=<droneFly>, shape="box", style="solid"];
+"droneFly.aggregate" [color="black", label=<droneFly.aggregate>, shape="box", style="solid"];
+"droneFly.base" [color="black", label=<droneFly.base>, shape="box", style="solid"];
+"droneFly.collision" [color="black", label=<droneFly.collision>, shape="box", style="solid"];
+"droneFly.detector" [color="black", label=<droneFly.detector>, shape="box", style="solid"];
+"droneFly.flight" [color="black", label=<droneFly.flight>, shape="box", style="solid"];
+"droneFly.main" [color="black", label=<droneFly.main>, shape="box", style="solid"];
+"droneFly.monitor" [color="black", label=<droneFly.monitor>, shape="box", style="solid"];
+"droneFly.collision" -> "droneFly" [arrowhead="open", arrowtail="none"];
+"droneFly.collision" -> "droneFly.aggregate" [arrowhead="open", arrowtail="none"];
+"droneFly.collision" -> "droneFly.base" [arrowhead="open", arrowtail="none"];
+"droneFly.collision" -> "droneFly.detector" [arrowhead="open", arrowtail="none"];
+"droneFly.flight" -> "droneFly.base" [arrowhead="open", arrowtail="none"];
+"droneFly.main" -> "droneFly" [arrowhead="open", arrowtail="none"];
+"droneFly.main" -> "droneFly.aggregate" [arrowhead="open", arrowtail="none"];
+"droneFly.main" -> "droneFly.collision" [arrowhead="open", arrowtail="none"];
+"droneFly.main" -> "droneFly.detector" [arrowhead="open", arrowtail="none"];
+"droneFly.main" -> "droneFly.flight" [arrowhead="open", arrowtail="none"];
+"droneFly.main" -> "droneFly.monitor" [arrowhead="open", arrowtail="none"];
+"droneFly.monitor" -> "droneFly.base" [arrowhead="open", arrowtail="none"];
+}

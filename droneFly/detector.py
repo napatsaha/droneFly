@@ -153,6 +153,7 @@ class MergedPeakDetector(BaseDetector):
             raise NotImplementedError("Strategy not implemented")
 
 
+
 if __name__ == "__main__":
 
     filename = "../data/Curved_24-04-22_14-47-46.csv"
