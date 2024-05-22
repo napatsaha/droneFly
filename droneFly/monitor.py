@@ -8,9 +8,10 @@ import datetime
 from djitellopy import Tello
 
 from droneFly.base import BaseWorker
+from droneFly import DATA_DIR
 
 logger = logging.getLogger(__name__)
-DIR_NAME = "..\\data"
+
 
 
 class DataCollector(BaseWorker):
@@ -32,7 +33,7 @@ class DataCollector(BaseWorker):
         # File creation based on current date time
         date_dir = datetime.datetime.now().strftime("%Y-%m-%d")
 
-        path = os.path.join(DIR_NAME, date_dir)
+        path = os.path.join(DATA_DIR, date_dir)
         if not os.path.exists(path):
             os.mkdir(path)
 

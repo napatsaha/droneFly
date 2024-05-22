@@ -120,11 +120,12 @@ class NormAggregator(BaseAggregator):
         """
         data = self.memory
         arr = np.array(data)
-        norm = np.linalg.norm(arr, axis=1)
-        if len(self.memory) > 1:
-            return diff_filter(norm)
-        else:
-            return norm
+        norm = np.linalg.norm(arr, axis=1, keepdims=True)
+        return diff_filter(norm)
+        # if len(self.memory) > 1:
+        #     return diff_filter(norm)
+        # else:
+        #     return norm
 
 
 # class MultiAggregator(BaseAggregator):
