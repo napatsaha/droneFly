@@ -1,0 +1,17 @@
+version: 1
+disable_existing_loggers: true
+formatters:
+  standard:
+    format: "%(asctime)s  [Lg-%(name)s] [Th-%(threadName)-10s] -- %(msg)s"
+    datefmt: "%H:%M:%S"
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: INFO
+    formatter: standard
+    stream: ext://sys.stdout
+loggers:
+  'droneFly':
+    level: INFO
+    handlers: [console]
+    propagate: false

@@ -1,5 +1,5 @@
 """
-New module
+Main Program
 
 Movement instructions control
 using Event to terminate threads
@@ -7,12 +7,13 @@ Zscore-based windowed-Jerk-sum xyz acceleration as signal to detect collision
 """
 
 import threading
-import logging
+import logging, logging.config
 import os
 
+import yaml
 from djitellopy import Tello
 
-from droneFly import aggregate, detector, collision, FLIGHT_PATH_DIR
+from droneFly import aggregate, detect_peak, collision, FLIGHT_PATH_DIR
 # from droneFly.collision import CollisionDetector, collision_handler
 from droneFly.flight import Controller
 from droneFly.monitor import DataCollector
@@ -28,12 +29,15 @@ def main():
     metric = ["agx", "agy", "agz"]
     flight_file = "move0.csv"
     agg_kwargs = dict(window=5)
-    pk_kwargs = dict(window=20, threshold=50, influence=0.1)
+    pk_kwargs = dict(window=20, threshold=5, influence=0.1)
 
     # Setup logging
-    logging.basicConfig(level=logging.INFO,
-                        format="%(asctime)s [%(threadName)-10s] -- %(msg)s",
-                        datefmt="%H:%M:%S")
+    with open("./logging.yaml") as file:
+        config = yaml.load(file, yaml.SafeLoader)
+    logging.config.dictConfig(config)
+    # logging.basicConfig(level=logging.INFO,
+    #                     format="%(asctime)s [%(threadName)-10s] -- %(msg)s",
+    #                     datefmt="%H:%M:%S")
 
     # Instantiate Drone and Termination Event
     terminate = threading.Event()
@@ -42,12 +46,14 @@ def main():
     # Collision Handler
     collision_thread = collision.CollisionHandler(
         drone=drone, fps=FPS, stopper=terminate,
-        aggregator=aggregate.MultiDiffAggregator(metrics=metric, separate=True, **agg_kwargs),
-        peaker=detector.MergedPeakDetector(
-            detector_class=detector.ZScorePeakDetection,
-            metrics=metric,
-            acceptance_rate='any',
-            **pk_kwargs),
+        # aggregator=aggregate.MultiDiffAggregator(metrics=metric, separate_output=True, **agg_kwargs),
+        aggregator=aggregate.NormAggregator(metrics=metric, **agg_kwargs),
+        # peaker=detect_peak.MergedPeakDetector(
+        #     detector_class=detect_peak.ZScorePeakDetection,
+        #     metrics=metric,
+        #     acceptance_rate='any',
+        #     **pk_kwargs),
+        peaker=detect_peak.ZScorePeakDetection(**pk_kwargs),
         name="Collision"
     )
 
@@ -63,7 +69,7 @@ def main():
     #                                         collision_detector=collision_detector
     #                                     ))
 
-    data_thread = DataCollector(drone, terminate, FPS, name = "CSV")
+    data_thread = DataCollector(drone, terminate, FPS, name="CSV")
 
     # Movement Handler
     movement_thread = Controller(drone, os.path.join(FLIGHT_PATH_DIR, flight_file),
@@ -89,7 +95,7 @@ def main():
 
     finally:
 
-        # Safety check
+        # Safety check if no MAX_WAIT runs out
         if not terminate.is_set():
             terminate.set()
 

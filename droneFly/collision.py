@@ -1,11 +1,13 @@
 import threading
-import logging
+import logging, logging.config
 import time
 
 from djitellopy import Tello
 
-from droneFly import aggregate, detector
+from droneFly import aggregate, detect_peak
 from droneFly.base import BaseWorker
+
+logger = logging.getLogger(__name__)
 
 
 class CollisionHandler(BaseWorker):
@@ -15,7 +17,7 @@ class CollisionHandler(BaseWorker):
     def __init__(self,
                  drone: Tello,
                  aggregator: aggregate.BaseAggregator,
-                 peaker: detector.BaseDetector,
+                 peaker: detect_peak.BasePeakDetector,
                  stopper: threading.Event, fps: int, **kwargs):
         super().__init__(stopper, fps, **kwargs)
         self.aggregator = aggregator
@@ -25,8 +27,8 @@ class CollisionHandler(BaseWorker):
     def process(self, state_dict: dict):
         agg_value = self.aggregator(state_dict)
         has_collided = self.peaker(agg_value)
-        if has_collided and not self.aggregator.separate:
-            logging.info("Collision threshold reached: %.2f" % agg_value)
+        if has_collided and not self.aggregator.separate_output:
+            logger.info("Collision threshold reached: %.2f" % agg_value)
         return has_collided
 
     def _run(self):
@@ -35,7 +37,7 @@ class CollisionHandler(BaseWorker):
         collide = self.process(state)
 
         if collide:
-            logging.info("Collided")
+            logger.info("Collided")
             self.terminate()
 
     def close(self):
@@ -46,7 +48,7 @@ class CollisionHandler(BaseWorker):
 # class CollisionDetector:
 #     def __init__(self,
 #                  aggregator: aggregate.BaseAggregator,
-#                  detect: detector.BaseDetector):
+#                  detect: detect_peak.BasePeakDetector):
 #         self.aggregator = aggregator
 #         self.detector = detect
 #

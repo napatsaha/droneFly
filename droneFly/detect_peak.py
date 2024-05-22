@@ -19,32 +19,32 @@ import pandas as pd
 from collections import deque
 
 
-class BaseDetector(ABC):
-    def add(self, value) -> bool:
-        pass
+logger = logging.getLogger(__name__)
 
+
+class BasePeakDetector(ABC):
     @abstractmethod
     def __call__(self, value) -> bool:
         pass
 
 
-class ZScorePeakDetection(BaseDetector):
+class ZScorePeakDetection(BasePeakDetector):
     """
-    Class docstring
+    Real time signal anomaly detector based on Z-score and standard deviation.
+
+    A new value entry is compared to the current running sample; if is *threshold* unit of
+    standard deviation away, then it is considered an anomaly.
+
+    Running sample is calculated based on the previous *window* entries observed.
+
+    New value which is considered an anomaly can be included in the sample based on the
+    *influence* factor, weighted against the last recent entry in the sample. An influence
+    of 1.0 adds the new value unchanged, while an influence of 0.0 uses the previous value
+    instead.
+
     """
     def __init__(self, window: int = 5, threshold: float = 3, influence: float = 1.0):
         """
-        Real time signal anomaly detector based on Z-score and standard deviation.
-
-        A new value entry is compared to the current running sample; if is *threshold* unit of
-        standard deviation away, then it is considered an anomaly.
-
-        Running sample is calculated based on the previous *window* entries observed.
-
-        New value which is considered an anomaly can be included in the sample based on the
-        *influence* factor, weighted against the last recent entry in the sample. An influence
-        of 1.0 adds the new value unchanged, while an influence of 0.0 uses the previous value
-        instead.
 
         """
         self.window = window
@@ -96,7 +96,7 @@ class ZScorePeakDetection(BaseDetector):
         self.std = np.std(self.sample)
 
 
-class MergedPeakDetector(BaseDetector):
+class MergedPeakDetector(BasePeakDetector):
     """
     Peak Detector which combines separate PeakDetectors for detecting individual signal
     independent of each other.
@@ -109,7 +109,7 @@ class MergedPeakDetector(BaseDetector):
     - 'any': if any one of the detector returns True
     - `all`: only if every single detector returns True
     """
-    def __init__(self, detector_class: Type[BaseDetector], metrics: list,
+    def __init__(self, detector_class: Type[BasePeakDetector], metrics: list,
                  acceptance_rate: Union[Literal['any', 'all'], float],
                  *args, **kwargs):
         if isinstance(acceptance_rate, float):
@@ -153,7 +153,6 @@ class MergedPeakDetector(BaseDetector):
             raise NotImplementedError("Strategy not implemented")
 
 
-
 if __name__ == "__main__":
 
     filename = "../data/Curved_24-04-22_14-47-46.csv"
@@ -165,7 +164,7 @@ if __name__ == "__main__":
     for row in data.itertuples():
         newvalue = getattr(row, metric)
 
-        bump = detector.add(newvalue)
+        bump = detector(newvalue)
 
         if bump:
             print(getattr(row, "Index"), getattr(row, "time_elapsed"), newvalue, sep="\t")

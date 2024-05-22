@@ -9,7 +9,7 @@ from djitellopy import Tello
 
 from droneFly.base import BaseWorker
 
-
+logger = logging.getLogger(__name__)
 DIR_NAME = "..\\data"
 
 

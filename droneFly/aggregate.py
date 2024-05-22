@@ -1,13 +1,18 @@
+import logging
 from typing import NamedTuple, Dict, Union, List
 
 import numpy as np
 from collections import deque
 
 
+logger = logging.getLogger(__name__)
+
+
 class BaseAggregator:
     def __init__(self, window):
         self.window = window
         self.memory = deque(maxlen=window)
+        self.separate_output = False
 
     def add(self, value):
         """
@@ -31,14 +36,14 @@ class BaseAggregator:
         return self.aggregate()
 
 
-class DiffAggregator(BaseAggregator):
-    def __init__(self, window):
-        super().__init__(window=window)
-
-    def aggregate(self):
-        diffs = np.diff(self.memory)
-        abs_sum = np.sum(np.abs(diffs))
-        return abs_sum
+# class DiffAggregator(BaseAggregator):
+#     def __init__(self, window):
+#         super().__init__(window=window)
+#
+#     def aggregate(self):
+#         diffs = np.diff(self.memory)
+#         abs_sum = np.sum(np.abs(diffs))
+#         return abs_sum
 
 
 def filter_state(value: Union[Dict, NamedTuple], metrics: List[str]):
@@ -72,10 +77,10 @@ class MultiDiffAggregator(BaseAggregator):
             if False (default), return a single value, summed across metrics
             if True, returns a tuple
     """
-    def __init__(self, window, metrics, separate: bool = False):
+    def __init__(self, window, metrics, separate_output: bool = False):
         super().__init__(window)
         self.metrics = metrics
-        self.separate = separate
+        self.separate_output = separate_output
 
     def add(self, value):
         value = filter_state(value, self.metrics)
@@ -89,7 +94,7 @@ class MultiDiffAggregator(BaseAggregator):
         """
         arr = np.array(self.memory)  # -> 2D array
         deltas = diff_filter(arr)  # sum of abs diff
-        if not self.separate:
+        if not self.separate_output:
             return deltas.sum()  # sum across metrics
         else:
             return deltas
@@ -122,15 +127,15 @@ class NormAggregator(BaseAggregator):
             return norm
 
 
-class MultiAggregator(BaseAggregator):
-
-    def __init__(self, window, metrics):
-        super().__init__(window=window)
-        self.metrics = metrics
-
-    def add(self, row):
-        values = [*map(lambda a: getattr(row, a), self.metrics)]
-        super().add(values)
+# class MultiAggregator(BaseAggregator):
+#
+#     def __init__(self, window, metrics):
+#         super().__init__(window=window)
+#         self.metrics = metrics
+#
+#     def add(self, row):
+#         values = [*map(lambda a: getattr(row, a), self.metrics)]
+#         super().add(values)
 
 
 if __name__ == "__main__":

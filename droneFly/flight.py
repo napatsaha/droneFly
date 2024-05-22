@@ -6,6 +6,9 @@ from djitellopy import Tello
 from droneFly.base import BaseWorker
 
 
+logger = logging.getLogger(__name__)
+
+
 class Controller(BaseWorker):
     """
     Class for setting instructions to control flight of Tello drone, via
