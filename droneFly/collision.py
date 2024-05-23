@@ -23,6 +23,7 @@ class CollisionHandler(BaseWorker):
         self.aggregator = aggregator
         self.peaker = peaker
         self.drone = drone
+        self.logger = logger
 
     def process(self, state_dict: dict):
         agg_value = self.aggregator(state_dict)

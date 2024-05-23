@@ -54,7 +54,7 @@ class ZScorePeakDetection(BasePeakDetector):
         self.std = None
         self.mean = None
 
-        self.logger = logging.getLogger("ZScorer")
+        # self.logger = logging.getLogger(__name__)
         
     def add(self, new_value) -> bool:
         """
@@ -64,8 +64,8 @@ class ZScorePeakDetection(BasePeakDetector):
             z = np.abs((new_value - self.mean) / self.std)
             is_signal = z >= self.threshold
             if is_signal:
-                self.logger.debug("Current Mean: %f -- Std: %f" % (self.mean, self.std))
-                self.logger.debug("New Value: {} -- Z Score {}".format(new_value, z))
+                logger.debug("Current Mean: %f -- Std: %f" % (self.mean, self.std))
+                logger.debug("New Value: {} -- Z Score {}".format(new_value, z))
         else:
             is_signal = False
 
@@ -85,7 +85,7 @@ class ZScorePeakDetection(BasePeakDetector):
             # old_value = new_value
             new_value = self.influence * new_value + \
                         (1 - self.influence) * self.sample[-1]
-            self.logger.debug("Adjusted value %f" % new_value)
+            logger.debug("Adjusted value %f" % new_value)
         self.sample.append(new_value)
 
     def _recalculate(self):
@@ -155,7 +155,7 @@ class MergedPeakDetector(BasePeakDetector):
 
 if __name__ == "__main__":
 
-    filename = "../data/Curved_24-04-22_14-47-46.csv"
+    filename = "../data/2024-04-22/Curved_24-04-22_14-47-46.csv"
     data = pd.read_csv(filename)
     metric = "agz"
 

@@ -19,6 +19,9 @@ from droneFly.flight import Controller
 from droneFly.monitor import DataCollector
 
 
+logger = logging.getLogger(__name__)
+
+
 def main():
     # For debugging purposes only
     global collision_thread, movement_thread, terminate, drone, data_thread
@@ -27,9 +30,9 @@ def main():
     FPS = 20
     MAX_WAIT = 30
     metric = ["agx", "agy", "agz"]
-    flight_file = "move0.csv"
+    flight_file = "move3.csv"
     agg_kwargs = dict(window=5)
-    pk_kwargs = dict(window=20, threshold=5, influence=0.1)
+    pk_kwargs = dict(window=20, threshold=10, influence=0.1)
 
     # Setup logging
     with open("./logging.yaml") as file:
@@ -80,7 +83,7 @@ def main():
     drone.connect()
 
     try:
-        logging.info("Taking Off")
+        logger.info("Taking Off")
         drone.takeoff()
 
         collision_thread.start()
@@ -97,6 +100,7 @@ def main():
 
         # Safety check if no MAX_WAIT runs out
         if not terminate.is_set():
+            logger.info("Max wait time %2f sec reached" % MAX_WAIT)
             terminate.set()
 
         drone.send_rc_control(0,0,0,0)

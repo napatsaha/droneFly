@@ -49,7 +49,7 @@ def agg_func3(arr):
 
 
 
-dat = pd.read_csv(r"../../data/24-05-20_15-40-59-164986.csv")
+dat = pd.read_csv(r"../../data/2024-05-20/24-05-20_15-40-59-164986.csv")
 
 metrics = ['agx', 'agy', 'agz']
 WINDOW_SIZE = 5

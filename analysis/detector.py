@@ -97,7 +97,7 @@ class ZScorePeakDetection(BaseDetector):
 
 if __name__ == "__main__":
 
-    filename = "../data/Curved_24-04-22_14-47-46.csv"
+    filename = "../data/2024-04-22/Curved_24-04-22_14-47-46.csv"
     data = pd.read_csv(filename)
     metric = "agz"
 

@@ -31,6 +31,7 @@ class Controller(BaseWorker):
         super().__init__(stopper, fps, **kwargs)
         self.file = open(filename, 'r')
         self.reader = csv.reader(self.file, delimiter=',')
+        # self.logger = logger
 
         # self._stopped = False
         self.drone = drone
@@ -40,7 +41,7 @@ class Controller(BaseWorker):
             rc, dur = self.read_next_line()
             self.process_movement(rc, dur)
         except StopIteration:
-            logging.info("Ended movement execution")
+            logger.info("Ended movement execution")
             self.terminate()
 
     def read_next_line(self) -> tuple:
@@ -55,7 +56,7 @@ class Controller(BaseWorker):
     #     self.current_control = rc
 
     def process_movement(self, rc, dur):
-        logging.info("Sending control {} for {} seconds".format(rc, dur))
+        logger.info("Sending control {} for {} seconds".format(rc, dur))
 
         self.drone.send_rc_control(*rc)
 

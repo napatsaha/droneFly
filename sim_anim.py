@@ -76,7 +76,7 @@ def simulate_data():
 if __name__ == "__main__":
     FPS = 2
     N = 80
-    FILE_SIM = "data/Curved_24-04-22_14-47-46.csv"
+    FILE_SIM = "data/2024-04-22/Curved_24-04-22_14-47-46.csv"
     # fig = plt.figure()
     t0 = time.time()
 

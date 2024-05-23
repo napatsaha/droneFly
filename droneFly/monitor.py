@@ -29,6 +29,7 @@ class DataCollector(BaseWorker):
                  **kwargs):
         super().__init__(stopper, fps, **kwargs)
         self.drone = drone
+        # self.logger = logger
 
         # File creation based on current date time
         date_dir = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -57,5 +58,5 @@ class DataCollector(BaseWorker):
 
     def close(self):
         super().close()
-        logging.info("CSV file recorded as %s" % os.path.split(os.path.realpath(self.csvfile.name))[-1])
+        logger.info("CSV file recorded as %s" % os.path.split(os.path.realpath(self.csvfile.name))[-1])
         self.csvfile.close()

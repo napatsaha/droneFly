@@ -3,6 +3,9 @@ import logging
 import threading
 
 
+logger = logging.getLogger(__name__)
+
+
 class BaseWorker(threading.Thread):
     """
     A worker class based on Threads that is made to be compatible with
@@ -14,6 +17,7 @@ class BaseWorker(threading.Thread):
     """
 
     stopper: threading.Event
+    # logger: logging.Logger
 
     def __init__(self,
                  stopper: threading.Event,
@@ -25,7 +29,7 @@ class BaseWorker(threading.Thread):
         self.fps = fps
 
     def start(self) -> None:
-        logging.info("Started %s Thread" % self.getName())
+        logger.info("Started %s Thread" % self.getName())
         super().start()
 
     def run(self):
@@ -40,10 +44,10 @@ class BaseWorker(threading.Thread):
         if not self.stopper.is_set():
             self.terminate()
 
-        logging.info("Ended %s Thread" % self.getName())
+        logger.info("Ended %s Thread" % self.getName())
 
     def terminate(self):
-        logging.info("Terminating Event called from %s Thread" % self.getName())
+        logger.info("Terminating Event called from %s Thread" % self.getName())
         self.stopper.set()
 
     @abc.abstractmethod
