@@ -5,7 +5,7 @@ Movement instructions control
 using Event to terminate threads
 Zscore-based windowed-Jerk-sum xyz acceleration as signal to detect collision
 """
-
+import datetime
 import threading
 import logging, logging.config
 import os
@@ -30,20 +30,24 @@ def main():
     FPS = 20
     MAX_WAIT = 30
     metric = ["agx", "agy", "agz"]
-    flight_file = "move3.csv"
+    flight_file = "move0.csv"
     agg_kwargs = dict(window=5)
-    pk_kwargs = dict(window=20, threshold=10, influence=0.1)
+    pk_kwargs = dict(window=20, threshold=30, influence=0.1)
 
     # Setup logging
+    logfilename = datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%S-%f") + ".log"
+    logfilename = os.path.join("../logs", logfilename)
     with open("./logging.yaml") as file:
         config = yaml.load(file, yaml.SafeLoader)
+    config['handlers']['logfile']['filename'] = logfilename
     logging.config.dictConfig(config)
     # logging.basicConfig(level=logging.INFO,
     #                     format="%(asctime)s [%(threadName)-10s] -- %(msg)s",
     #                     datefmt="%H:%M:%S")
 
     # Instantiate Drone and Termination Event
-    terminate = threading.Event()
+    terminate = threading.Event()  # Post take off until before landing
+    finished = threading.Event()  # Activate before take, until after finish landing
     drone = Tello()
 
     # Collision Handler
@@ -60,37 +64,27 @@ def main():
         name="Collision"
     )
 
-    # collision_detector = CollisionDetector(
-    #     aggregate.MultiDiffAggregator(metrics=metric, **agg_kwargs),
-    #     detector.ZScorePeakDetection(**pk_kwargs)
-    # )
-    #
-    # collision_thread = threading.Thread(target=collision_handler, name="Collision",
-    #                                     kwargs=dict(
-    #                                         drone=drone, fps=FPS,
-    #                                         event=terminate,
-    #                                         collision_detector=collision_detector
-    #                                     ))
-
-    data_thread = DataCollector(drone, terminate, FPS, name="CSV")
-
     # Movement Handler
     movement_thread = Controller(drone, os.path.join(FLIGHT_PATH_DIR, flight_file),
                                  fps=FPS, stopper=terminate, name="Movement")
-    # movement_thread = threading.Thread(target=controller.run, name="Movement", args=(terminate,))
+    # Data collector
+    data_thread = DataCollector(drone, finished, FPS, name="CSV")
 
     # Establish connection
+    logger.info("Establishing Connection...")
     drone.connect()
 
+    data_thread.start()
+
     try:
-        logger.info("Taking Off")
+        logger.info("Taking Off...")
         drone.takeoff()
+        logger.info("Completed taking off procedure")
 
         collision_thread.start()
 
         movement_thread.start()
 
-        data_thread.start()
 
         # collision_thread.join()
         # movement_thread.join()
@@ -100,14 +94,18 @@ def main():
 
         # Safety check if no MAX_WAIT runs out
         if not terminate.is_set():
-            logger.info("Max wait time %2f sec reached" % MAX_WAIT)
+            logger.info("Max wait time %.1f sec reached" % MAX_WAIT)
             terminate.set()
 
         drone.send_rc_control(0,0,0,0)
+        logger.info("Initiating landing...")
         drone.land()
+        logger.info("Successfully landed")
+
+        finished.set()
 
         # logging.info("Battery remaining %s", drone.get_battery())
-        print(f"Battery: {drone.get_battery()}%")
+        logger.info(f"Battery Remaining: {drone.get_battery()}%")
 
         drone.end()
 

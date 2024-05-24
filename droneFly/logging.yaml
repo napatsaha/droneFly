@@ -10,12 +10,19 @@ handlers:
     level: DEBUG
     formatter: standard
     stream: ext://sys.stdout
+  logfile:
+    class: logging.FileHandler
+#    filename: "test.log"
+    formatter: standard
+    level: DEBUG
+    mode: 'a'
+
 loggers:
   'droneFly':
     level: DEBUG
-    handlers: [console]
+    handlers: [console, logfile]
     propagate: false
   '__main__':
     level: INFO
-    handlers: [console]
+    handlers: [console, logfile]
     propagate: false
