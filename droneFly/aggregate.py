@@ -128,16 +128,5 @@ class NormAggregator(BaseAggregator):
         #     return norm
 
 
-# class MultiAggregator(BaseAggregator):
-#
-#     def __init__(self, window, metrics):
-#         super().__init__(window=window)
-#         self.metrics = metrics
-#
-#     def add(self, row):
-#         values = [*map(lambda a: getattr(row, a), self.metrics)]
-#         super().add(values)
-
-
 if __name__ == "__main__":
     pass

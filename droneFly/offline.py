@@ -1,7 +1,8 @@
 """
-For plotting signals post data collection.
+For offline analysis and plotting of collected data using custom Collision Detection Algorithms
+(Aggregator + Peaker combination)
 
-Useful for comparing different collision detectors, aggregators, peak detectors setup.
+[Work in Progress]
 """
 
 import os
@@ -12,14 +13,13 @@ import seaborn as sns
 import pandas as pd
 import os
 
-print()
 import droneFly
 from droneFly import aggregate, detect_peak, collision
 
 metric = ["agx", "agy", "agz"]
 agg_kwargs = dict(window=5)
-pk_kwargs = dict(window=20, threshold=5, influence=0.1)
-data_file = "Gust_24-05-08_16-12-16.csv"
+pk_kwargs = dict(window=20, threshold=50, influence=0.1)
+data_file = "2024-05-24\\24-05-24_16-36-30-503328.csv"
 
 data = pd.read_csv(os.path.join(droneFly.DATA_DIR, data_file))
 subdata = data.loc[:, metric]
@@ -30,15 +30,16 @@ aggregator = aggregate.NormAggregator(metrics=metric, **agg_kwargs)
 peaker = detect_peak.ZScorePeakDetection(**pk_kwargs)
 
 agg_values = []
-collides = []
+zscores = []
 
 for row in subdata.itertuples():
-    agg_value = aggregator(row)
+    agg_value = aggregator(row).item()
     print(row.Index, agg_value)
+    zscore = peaker.calculate(agg_value)
     collide = peaker(agg_value)
 
     agg_values.append(agg_value)
-    collides.append(collide)
+    zscores.append(zscore)
 
-sns.lineplot(x=data.time_elapsed, y=np.array(agg_values).flatten())
+plt.plot(data.time_elapsed, zscores)
 plt.show()

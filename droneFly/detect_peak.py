@@ -56,23 +56,34 @@ class ZScorePeakDetection(BasePeakDetector):
 
         # self.logger = logging.getLogger(__name__)
         
-    def add(self, new_value) -> bool:
+    def add(self, new_value, return_score: bool = False) -> bool:
         """
         Add new value to filter, and return whether the value is an anomaly
         """
-        if len(self.sample) >= self.window:
-            z = np.abs((new_value - self.mean) / self.std)
-            is_signal = z >= self.threshold
-            if is_signal:
-                logger.debug("Current Mean: %f -- Std: %f" % (self.mean, self.std))
-                logger.debug("New Value: {} -- Z Score {}".format(new_value, z))
-        else:
-            is_signal = False
+        z = self.calculate(new_value)
+        is_signal = z >= self.threshold if z is not None else False
+        if is_signal:
+            logger.debug("Current Mean: %f -- Std: %f" % (self.mean, self.std))
+            logger.debug("New Value: {} -- Z Score {}".format(new_value, z))
+
+        # if len(self.sample) >= self.window:
+        #     z = self.calculate(new_value)
+        #     is_signal = z >= self.threshold
+        #
+        # else:
+        #     is_signal = False
 
         self._append(new_value, is_signal)
         self._recalculate()
 
         return is_signal
+
+    def calculate(self, new_value):
+        if len(self.sample) >= self.window:
+            z = np.abs((new_value - self.mean) / self.std)
+            return z
+        else:
+            return None
 
     def __call__(self, new_value):
         return self.add(new_value)
