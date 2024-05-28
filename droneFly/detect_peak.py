@@ -55,7 +55,10 @@ class ZScorePeakDetection(BasePeakDetector):
         self.mean = None
 
         # self.logger = logging.getLogger(__name__)
-        
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(window={self.window}, threshold={self.threshold}, influence={self.influence})"
+
     def add(self, new_value, return_score: bool = False) -> bool:
         """
         Add new value to filter, and return whether the value is an anomaly

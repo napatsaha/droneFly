@@ -82,6 +82,9 @@ class MultiDiffAggregator(BaseAggregator):
         self.metrics = metrics
         self.separate_output = separate_output
 
+    def __repr__(self):
+        return f"{self.__class__.__name__}(window={self.window}, metrics={self.metrics}, separate_output={self.separate_output})"
+
     def add(self, value):
         value = filter_state(value, self.metrics)
 
@@ -108,6 +111,9 @@ class NormAggregator(BaseAggregator):
     def __init__(self, window, metrics):
         super().__init__(window)
         self.metrics = metrics
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}(window={self.window}, metrics={self.metrics})"
 
     def add(self, value):
         value = filter_state(value, self.metrics)
