@@ -4,6 +4,9 @@ formatters:
   standard:
     format: "%(asctime)s  [L:%(name)-15s] [T:%(threadName)-10s] [F:%(filename)-12s] -- %(msg)s"
     datefmt: "%H:%M:%S"
+  detailed:
+    format: "%(asctime)s:%(msecs)d  [L:%(name)-15s] [T:%(threadName)-10s] [F:%(filename)-12s] -- %(msg)s"
+    datefmt: "%H:%M:%S"
 handlers:
   console:
     class: logging.StreamHandler
@@ -13,7 +16,7 @@ handlers:
   logfile:
     class: logging.FileHandler
 #    filename: "test.log"
-    formatter: standard
+    formatter: detailed
     level: DEBUG
     mode: 'a'
 

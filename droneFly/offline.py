@@ -105,7 +105,7 @@ def plot_offline_grid(file_list: list, labels: Optional[list], n_clusters: Optio
 
     column_headers = ["Agg_Values", "Z Scores", "Derivatives"]
 
-    fig, axs = plt.subplots(nrows=n, ncols=3, figsize=(4.5*3, 3.5*n))
+    fig, axs = plt.subplots(nrows=n, ncols=3, figsize=(4.5*3, 3.5*n), sharex='col', sharey='col')
 
     cm = plt.get_cmap('Set1_r', lut=NC)
 
@@ -126,30 +126,35 @@ def plot_offline_grid(file_list: list, labels: Optional[list], n_clusters: Optio
         print(f"Percentage of outliers = {cluster_filter.mean():.0%}\tCluster with largest group: #{largest_cluster}")
 
         for j, ax in enumerate(axs_row):
+            # Agg values ts plot
             if j == 0:
                 ax.plot(data.time_elapsed, data.agg_values)
                 ax.scatter(data.time_elapsed[2:][cluster_filter],
                            data.agg_values[2:][cluster_filter],
                            c=cm(cluster[cluster_filter]))
                 ax.set_xlabel("Time Elapsed (sec)")
-            elif j==1:
+            # Z score ts plot
+            elif j == 1:
                 ax.plot(data.time_elapsed, data.zscores)
                 ax.scatter(data.time_elapsed[2:][cluster_filter],
                            data.zscores[2:][cluster_filter],
                            c=cm(cluster[cluster_filter]))
                 ax.axhline(data.peaker.threshold, linestyle='dashed', color='red')
                 ax.set_xlabel("Time Elapsed (sec)")
-            elif j== 2:
+            # Derivatives scatter plot
+            elif j == 2:
                 ax.scatter(X[:,0], X[:,1], c=cm(cluster))
-                ax.set_xscale('log')
-                ax.set_yscale('log')
+                ax.set_xlabel("d1")
+                ax.set_ylabel("d2")
+                # ax.set_xscale('log')
+                # ax.set_yscale('log')
             if i == 0:
                 ax.set_title(column_headers[j])
             if j == 0:
                 ax.set_ylabel(label, rotation=0, size='large')
 
-    for ax in axs.flat:
-        ax.label_outer()
+    # for ax in axs.flat:
+    #     ax.label_outer()
 
     fig.suptitle(f"Grid Comparison \n {data.aggregator}\n{data.peaker}")
     fig.tight_layout()
@@ -170,4 +175,4 @@ if __name__ == "__main__":
 
     # plot_offline(files, (2, 3), labels)
 
-    plot_offline_grid(files, labels)
+    plot_offline_grid(files, labels, n_clusters=2)

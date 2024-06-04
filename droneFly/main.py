@@ -32,7 +32,7 @@ def main():
     metric = ["agx", "agy", "agz"]
     flight_file = "move0.csv"
     agg_kwargs = dict(window=5)
-    pk_kwargs = dict(window=20, threshold=30, influence=0.1)
+    pk_kwargs = dict(window=20, threshold=50, influence=0.1)
 
     # Setup logging
     logfilename = datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%S-%f") + ".log"
