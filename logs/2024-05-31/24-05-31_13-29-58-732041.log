@@ -1,0 +1,16 @@
+13:29:58:732  [L:__main__       ] [T:MainThread] [F:main.py     ] -- Establishing Connection...
+13:29:58:843  [L:droneFly.base  ] [T:MainThread] [F:base.py     ] -- Started CSV Thread
+13:29:58:843  [L:__main__       ] [T:MainThread] [F:main.py     ] -- Taking Off...
+13:30:05:385  [L:__main__       ] [T:MainThread] [F:main.py     ] -- Completed taking off procedure
+13:30:05:385  [L:droneFly.base  ] [T:MainThread] [F:base.py     ] -- Started Collision Thread
+13:30:05:385  [L:droneFly.base  ] [T:MainThread] [F:base.py     ] -- Started Movement Thread
+13:30:05:385  [L:droneFly.flight] [T:Movement  ] [F:flight.py   ] -- Sending control [0, 0, 0, 0] for 10.0 seconds
+13:30:15:451  [L:droneFly.flight] [T:Movement  ] [F:flight.py   ] -- Ended movement execution
+13:30:15:451  [L:droneFly.base  ] [T:Movement  ] [F:base.py     ] -- Terminating Event called from Movement Thread
+13:30:15:451  [L:droneFly.base  ] [T:Movement  ] [F:base.py     ] -- Ended Movement Thread
+13:30:15:451  [L:__main__       ] [T:MainThread] [F:main.py     ] -- Initiating landing...
+13:30:15:451  [L:droneFly.base  ] [T:Collision ] [F:base.py     ] -- Ended Collision Thread
+13:30:19:325  [L:__main__       ] [T:MainThread] [F:main.py     ] -- Successfully landed
+13:30:19:325  [L:__main__       ] [T:MainThread] [F:main.py     ] -- Battery Remaining: 56%
+13:30:19:325  [L:droneFly.base  ] [T:CSV       ] [F:base.py     ] -- Ended CSV Thread
+13:30:19:325  [L:droneFly.monitor] [T:CSV       ] [F:monitor.py  ] -- CSV file recorded as 24-05-31_13-29-58-732041.csv
