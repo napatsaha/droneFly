@@ -54,7 +54,8 @@ def agg_func4(arr):
     arr = (arr - MU) / SIGMA
     return np.sum(np.abs(np.diff(arr, axis=0)), axis=0)
 
-dat = pd.read_csv(r"C:\Users\napat\Python\droneFly\data\Gust_24-05-08_16-17-11.csv")
+# dat = pd.read_csv(r"C:\Users\napat\Python\droneFly\data\Gust_24-05-08_16-17-11.csv")
+dat = pd.read_csv("./data/2024-05-08/Gust_24-05-08_16-17-11.csv")
 
 metrics = ['agx', 'agy', 'agz']
 WINDOW_SIZE = 5

@@ -3,8 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 files = [
-    ("../data/Curved_24-04-22_14-47-46.csv", ""),
-    ("../data/Curved_24-04-22_14-46-45.csv", "")
+    ("data/Curved_24-04-22_14-47-46.csv", ""),
+    ("data/Curved_24-04-22_14-46-45.csv", "")
 ]
 
 period = 5
