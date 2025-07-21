@@ -50,7 +50,7 @@ def agg_func3(arr):
 
 
 # dat = pd.read_csv(r"C:\Users\napat\Python\droneFly\data\Curved_24-04-22_14-47-46.csv")
-dat = pd.read_csv("./data/2024-04-22/Curved_24-04-22_14-47-46.csv")
+dat = pd.read_csv("data/2025-07-21/25-07-21_14-25-47-904481.csv")
 
 
 metrics = ['agx', 'agy', 'agz']

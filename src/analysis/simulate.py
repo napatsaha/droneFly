@@ -1,26 +1,29 @@
-import logging
+import logging, yaml
+from pathlib import Path
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib
 from matplotlib.animation import FuncAnimation
 
-from aggregate import DiffAggregator, MultiDiffAggregator
-from detector import ZScorePeakDetection
+# from analysis.aggregate import DiffAggregator, MultiDiffAggregator
+# from droneFly.aggregate import NormAggregator
+# from droneFly.detect_peak import ZScorePeakDetection
+# from analysis.detector import ZScorePeakDetection
+from droneFly import aggregate, detect_peak
 
 
-if __name__ == "__main__":
-    animate = True
-
-    logger = logging.getLogger("ZScorer")
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
-
-    filename = "./data/2024-04-22/Curved_24-04-22_14-47-46.csv"
+def simulate(run_path, animate=False):
+    run_dir = Path(run_path)
+    filename = run_dir / Path("drone_state.csv")
     data = pd.read_csv(filename)
-    metric = ["agx", "agy", "agz"]
-    aggregator = MultiDiffAggregator(window=5, metrics=metric)
-
-    detector = ZScorePeakDetection(window=20, threshold=5, influence=1)
+    # metric = ["agx", "agy", "agz"]
+    with open(run_dir / "experiment_config.yaml", "r") as f:
+        config = yaml.safe_load(f)
+    # aggregator = NormAggregator(window=5, metrics=metric)
+    # detector = ZScorePeakDetection(window=20, threshold=20, influence=1)
+    aggregator=getattr(aggregate, config["agg_cls"])(**config["agg_kwargs"])
+    detector=getattr(detect_peak, config["pk_cls"])(**config["pk_kwargs"])
+    metric = config["agg_kwargs"]["metrics"]
 
     if animate:
         matplotlib.use("TkAgg")
@@ -48,12 +51,9 @@ if __name__ == "__main__":
     def update(row):
         # global  originals, signals, timesec
         # newvalue = getattr(row, metric)
-
         # row = data.iloc[row_id, :]
-
         # if row.Index == 0:
         #     reset()
-
         newvalue = aggregator(row)
         bump = detector(newvalue)
 
@@ -102,3 +102,6 @@ if __name__ == "__main__":
         ax[1].set_title("Signal")
 
     plt.show()
+
+if __name__ == "__main__":
+    simulate("results/2025-07-21/25-07-21_17-00-27", animate=True)

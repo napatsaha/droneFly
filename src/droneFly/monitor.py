@@ -26,20 +26,25 @@ class DataCollector(BaseWorker):
                  drone: Tello,
                  stopper: threading.Event,
                  fps: int,
+                 file_path: str = None,
                  **kwargs):
         super().__init__(stopper, fps, **kwargs)
         self.drone = drone
         # self.logger = logger
 
         # File creation based on current date time
-        date_dir = datetime.datetime.now().strftime("%Y-%m-%d")
+        if file_path is not None:
+            filename = "drone_state.csv"
+            filename = os.path.join(file_path, filename)
+        else:
+            date_dir = datetime.datetime.now().strftime("%Y-%m-%d")
 
-        path = os.path.join(DATA_DIR, date_dir)
-        if not os.path.exists(path):
-            os.mkdir(path)
+            path = os.path.join(DATA_DIR, date_dir)
+            if not os.path.exists(path):
+                os.mkdir(path)
 
-        filename = datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%S-%f") + ".csv"
-        filename = os.path.join(path, filename)
+            filename = datetime.datetime.now().strftime("%y-%m-%d_%H-%M-%S-%f") + ".csv"
+            filename = os.path.join(path, filename)
         self.csvfile = open(filename, 'w', newline='')
 
         # Set up csv writer

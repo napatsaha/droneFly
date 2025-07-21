@@ -6,7 +6,7 @@ FPS = 10
 
 drone = Tello()
 
-drone.connect()
+drone.connect(False)
 
 drone.set_speed(10)
 

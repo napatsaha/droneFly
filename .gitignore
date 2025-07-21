@@ -1,0 +1,10 @@
+*/__pycache__/
+
+results/
+config/
+data/
+logs/
+figure/
+
+.DS_Store
+*.pyc
