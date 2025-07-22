@@ -10,6 +10,7 @@ import threading
 import logging, logging.config
 import os
 import argparse
+import time
 
 import yaml
 from djitellopy import Tello
@@ -19,6 +20,7 @@ from droneFly import aggregate, detect_peak, collision, \
 # from droneFly.collision import CollisionDetector, collision_handler
 from droneFly.flight import Controller
 from droneFly.monitor import DataCollector
+from analysis.simulate import simulate
 
 
 logger = logging.getLogger(__name__)
@@ -54,6 +56,7 @@ def main(config_file=None, save=True, flight_file=None):
         exp_config = yaml.safe_load(file)
     FPS = exp_config["fps"]
     MAX_WAIT = exp_config["max_wait"]
+    LANDING_DELAY = exp_config.get("landing_delay", 0)
     if flight_file is not None:
         flight_file = flight_file
         exp_config["flight_file"] = flight_file
@@ -157,6 +160,7 @@ def main(config_file=None, save=True, flight_file=None):
         drone.send_rc_control(0,0,0,0)
         logger.info("Initiating landing...")
         drone.land()
+        time.sleep(LANDING_DELAY)
         logger.info("Successfully landed")
 
         finished.set()
@@ -165,6 +169,8 @@ def main(config_file=None, save=True, flight_file=None):
         logger.info(f"Battery Remaining: {drone.get_battery()}%")
 
         drone.end()
+
+    return run_dir
 
 
 if __name__ == "__main__":
@@ -175,6 +181,10 @@ if __name__ == "__main__":
                         help="Prevent saving results to a directory")
     parser.add_argument("--flight-file", "-f", type=str, default="move_stationary.csv",
                         help="Path to the flight trajectory file within the flight path directory")
+    parser.add_argument("--plot", "-p", action="store_true", default=False)
+    parser.add_argument("--animate", "-a", action="store_true", default=False)
     args = parser.parse_args()
     print(f"config file: {args.config}, save: {not args.dont_save}")
-    main(config_file=args.config, save=not args.dont_save, flight_file=args.flight_file)
+    run_name = main(config_file=args.config, save=not args.dont_save, flight_file=args.flight_file)
+    if args.plot:
+        simulate(run_name, animate=args.animate)

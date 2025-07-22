@@ -104,4 +104,4 @@ def simulate(run_path, animate=False):
     plt.show()
 
 if __name__ == "__main__":
-    simulate("results/2025-07-21/25-07-21_17-00-27", animate=True)
+    simulate("results/2025-07-22/25-07-22_13-40-53", animate=False)
